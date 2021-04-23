@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+<div class="d-flex justify-content-center">
+    <div class="card auth-card d-inline-flex">
+        <div class="card_body">
+            {% block form %}{% endblock %}
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

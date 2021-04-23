@@ -1,0 +1,69 @@
+{% macro schedule_table(day_schedule) %}
+<table class="table table-striped table-light">
+    {% for subject in day_schedule %}
+    <tr>
+        <td>{{loop.index}}</td>
+        <td>{{subject}}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endmacro %}
+
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<h3>{{class_.name}}</h3>
+
+<div class="card d-inline-flex schedule">
+    <h3 align="center">Расписание занятий</h3>
+    {% if not schedule %}
+    {% if is_admin %}
+    <button type="button" class="btn btn-link"><a href="">Добавить</a></button>
+    {% else %}
+    <span class="align-center">Нет расписания</span>
+    {% endif %}
+    {% else %}
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link active" data-toggle="tab" href="#mon">Пн</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#tue">Вт</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#wed">Ср</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#thu">Чт</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#fri">Пт</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#sat">Сб</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="mon">{{schedule_table(schedule[1])}}</div>
+        <div class="tab-pane fade" id="tue">{{schedule_table(schedule[2])}}</div>
+        <div class="tab-pane fade" id="wed">{{schedule_table(schedule[3])}}</div>
+        <div class="tab-pane fade" id="thu">{{schedule_table(schedule[4])}}</div>
+        <div class="tab-pane fade" id="fri">{{schedule_table(schedule[5])}}</div>
+        <div class="tab-pane fade" id="sat">{{schedule_table(schedule[6])}}</div>
+    </div>
+    {% if is_admin %}
+    <button type="button" class="btn btn-link"><a href="">Изменить</a></button>
+    {% endif %}
+
+    {% endif %}
+</div>
+
+<div class="card d-inline-flex schedule">
+    <h3 align="center">Участники</h3>
+
+</div>
+
+
+{% endblock %}

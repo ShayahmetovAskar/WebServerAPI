@@ -1,0 +1,58 @@
+{% macro render_field(field) %}
+<dd>{{ field(**kwargs)|safe }}
+    {% if field.errors %}
+    <ul class=errors>
+        {% for error in field.errors %}
+        <li>{{ error }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+</dd>
+{% endmacro %}
+
+
+{% macro day_card(ind) %}
+<div class="card" align="center" style="margin-top: 20px">
+    <div class="card_body">
+        <h3>{{weekdays[ind]}}</h3>
+        {% for subject_form in form.days[ind].subjects %}
+        {{render_field(subject_form)}}
+        {% endfor %}
+        <button type="button submit" name="1324" class="btn btn-link"><a
+                href="/class/{{class_id}}/add_schedule/subjects/{% if ind==0 %}{{num_subjects[0] + 1}}{% else %}{{num_subjects[0]}}{% endif %}/{% if ind==1 %}{{num_subjects[1] + 1}}{% else %}{{num_subjects[1]}}{% endif %}/{% if ind==2 %}{{num_subjects[2] + 1}}{% else %}{{num_subjects[2]}}{% endif %}/{% if ind==3 %}{{num_subjects[3] + 1}}{% else %}{{num_subjects[3]}}{% endif %}/{% if ind==4 %}{{num_subjects[4] + 1}}{% else %}{{num_subjects[4]}}{% endif %}/{% if ind==5 %}{{num_subjects[5] + 1}}{% else %}{{num_subjects[5]}}{% endif %}">Добавить
+            поле</a></button>
+
+    </div>
+</div>
+
+
+{% endmacro %}
+
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<h3>Добавление расписания</h3>
+<form action="" method="post" enctype="multipart/form-data">
+    {{form.hidden_tag()}}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">{{day_card(0)}}</div>
+            <div class="col-md-6">{{day_card(1)}}</div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">{{day_card(2)}}</div>
+            <div class="col-md-6">{{day_card(3)}}</div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">{{day_card(4)}}</div>
+            <div class="col-md-6">{{day_card(5)}}</div>
+        </div>
+    </div>
+    <br>
+    <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+</form>
+
+
+{% endblock %}

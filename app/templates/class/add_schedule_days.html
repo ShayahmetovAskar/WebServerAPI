@@ -1,0 +1,76 @@
+{% extends "card_base.html" %}
+
+{% block form %}
+
+<h3>Добавление расписания</h3>
+<h4>Введите количество уроков в каждый день недели</h4>
+<form action="" method="post">
+    {{ form.hidden_tag() }}
+    <p>
+        {{ form.mon.label }}
+        {{ form.mon(class="form-control")}}
+        {% for error in form.mon.errors %}
+        <div class="alert alert-danger" role="alert">
+            {{error}}
+        </div>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.tue.label }}
+        {{ form.tue(class="form-control")}}
+        {% for error in form.tue.errors %}
+        <div class="alert alert-danger" role="alert">
+            {{error}}
+        </div>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.wed.label }}
+        {{ form.wed(class="form-control")}}
+        {% for error in form.wed.errors %}
+        <div class="alert alert-danger" role="alert">
+            {{error}}
+        </div>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.thu.label }}
+        {{ form.thu(class="form-control")}}
+        {% for error in form.thu.errors %}
+        <div class="alert alert-danger" role="alert">
+            {{error}}
+        </div>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.fri.label }}
+        {{ form.fri(class="form-control")}}
+        {% for error in form.fri.errors %}
+        <div class="alert alert-danger" role="alert">
+            {{error}}
+        </div>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.sat.label }}
+        {{ form.sat(class="form-control")}}
+        {% for error in form.sat.errors %}
+        <div class="alert alert-danger" role="alert">
+            {{error}}
+        </div>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.sun.label }}
+        {{ form.sun(class="form-control")}}
+        {% for error in form.sun.errors %}
+        <div class="alert alert-danger" role="alert">
+            {{error}}
+        </div>
+        {% endfor %}
+    </p>
+    <p>{{form.submit(type="submit", class="btn btn-primary")}}</p>
+    <div>{{ message }}</div>
+</form>
+
+{% endblock %}
