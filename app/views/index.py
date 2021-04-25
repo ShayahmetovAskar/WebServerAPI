@@ -6,6 +6,8 @@ from flask import Blueprint, render_template, request, url_for, flash, redirect
 from flask_login import current_user, login_required
 
 from app.data import db_session
+from app.data.classes import Class
+from app.data.users import User
 from app.forms.update_account_form import UpdateAccountData
 
 index = Blueprint('index', __name__, static_folder='static',
@@ -34,8 +36,12 @@ def test():
 @index.route('/profile/')
 @login_required
 def profile():
+    db_sess = db_session.create_session()
+    current_user_ = db_sess.query(User).filter(User.id == current_user.id).first()
+    classes = [{'id': i.id, 'name': i.name} for i in current_user_.member_of]
+    db_sess.close()
     image_file = url_for('static', filename='img/profile_pictures/' + current_user.image_file)
-    return render_template('profile.html', image_file=image_file)
+    return render_template('profile.html', image_file=image_file, classes=classes)
 
 
 @index.route('/update_user_data', methods=['GET', 'POST'])

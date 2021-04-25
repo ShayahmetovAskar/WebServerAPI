@@ -30,4 +30,3 @@ def create_app(config_file='settings.py'):
     root_path = app.root_path
 
     return app
-

@@ -15,7 +15,14 @@
 {% block content %}
 
 <br>
-<h3 align="center">{{class_.name}}</h3>
+<div class="d-flex justify-content-center" style="flex-direction: row">
+    <h3 align="center">{{class_.name}}</h3>
+    {% if is_creator %}
+    <a href="/class/{{class_.id}}/settings" type="button" class="btn btn-outline-light" style="margin-left: 1rem">Настройки</a>
+    {% endif %}
+
+</div>
+
 <br>
 
 <div class="container">

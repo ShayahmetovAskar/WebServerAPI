@@ -28,6 +28,7 @@ def check_admin(class_id, user=current_user):
     return is_admin
 
 
+# Проверка на правильность ID класса
 def correct_class_id(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -42,6 +43,7 @@ def correct_class_id(f):
     return decorated_function
 
 
+# Состоит ли текущий пользователь в классе
 def membership_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -56,6 +58,7 @@ def membership_required(f):
     return decorated_function
 
 
+# Является ли текущий пользователь администратором класса
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -70,6 +73,7 @@ def admin_required(f):
     return decorated_function
 
 
+# Класс-помощник работы с датами
 class DateHelper:
     months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября',
               'октября', 'ноября', 'декабря']
@@ -80,6 +84,7 @@ class DateHelper:
         y, w, _ = today.isocalendar()
         return y, w
 
+    # Прибавить неделю к текущей дате
     @staticmethod
     def add_week(y, w):
         date = datetime.datetime.strptime(f'{y} {w} {1}', '%G %V %u')
@@ -87,6 +92,7 @@ class DateHelper:
         y, w, _ = date.isocalendar()
         return y, w
 
+    # Отнять неделю от текущей даты
     @staticmethod
     def subtract_week(y, w):
         date = datetime.datetime.strptime(f'{y} {w} {1}', '%G %V %u')
@@ -94,6 +100,7 @@ class DateHelper:
         y, w, _ = date.isocalendar()
         return y, w
 
+    # Форматированный вывод даты
     @staticmethod
     def formatted_dates(y, w):
         date = datetime.datetime.strptime(f'{y} {w} {1}', '%G %V %u')
@@ -107,6 +114,7 @@ class DateHelper:
 class_views = Blueprint('class_views', __name__, static_folder='static', template_folder='templates')
 
 
+# Назначение администратором класса
 @class_views.route('/class/<int:class_id>/set_admin/<int:user_id>')
 @login_required
 @correct_class_id
@@ -126,6 +134,28 @@ def set_admin(class_id, user_id):
     return redirect(f'/class/{class_id}')
 
 
+# Разжалование администратора класса
+@class_views.route('/class/<int:class_id>/unset_admin/<int:user_id>')
+@login_required
+@correct_class_id
+def unset_admin(class_id, user_id):
+    db_sess = db_session.create_session()
+    class_ = db_sess.query(Class).get(class_id)
+    if current_user.id != class_.creator_id or user_id == current_user.id:
+        db_sess.close()
+        return abort(404)
+    user = db_sess.query(User).get(user_id)
+    if not user:
+        db_sess.close()
+        return abort(404)
+    if user in class_.admins:
+        class_.admins.remove(user)
+    db_sess.commit()
+    db_sess.close()
+    return redirect(f'/class/{class_id}')
+
+
+# Изгнание из класса
 @class_views.route('/class/<int:class_id>/kick/<int:user_id>')
 @login_required
 @correct_class_id
@@ -150,26 +180,7 @@ def kick(class_id, user_id):
     return redirect(f'/class/{class_id}')
 
 
-@class_views.route('/class/<int:class_id>/unset_admin/<int:user_id>')
-@login_required
-@correct_class_id
-def unset_admin(class_id, user_id):
-    db_sess = db_session.create_session()
-    class_ = db_sess.query(Class).get(class_id)
-    if current_user.id != class_.creator_id or user_id == current_user.id:
-        db_sess.close()
-        return abort(404)
-    user = db_sess.query(User).get(user_id)
-    if not user:
-        db_sess.close()
-        return abort(404)
-    if user in class_.admins:
-        class_.admins.remove(user)
-    db_sess.commit()
-    db_sess.close()
-    return redirect(f'/class/{class_id}')
-
-
+# Добавление нового класса
 @class_views.route('/add_class', methods=['GET', 'POST'])
 @login_required
 def add_class():
@@ -178,7 +189,8 @@ def add_class():
         db_sess = db_session.create_session()
         if db_sess.query(Class).filter(Class.name == form.name.data).first():
             return render_template('class/add_class.html', form=form,
-                                   message='Название уже занято. Попробуйте другое')
+                                   message='Название уже занято. Попробуйте другое',
+                                   header='Добавление класса')
         class_ = Class(
             name=form.name.data,
             key=form.key.data,
@@ -194,9 +206,10 @@ def add_class():
 
         return redirect(f'/class/{class_id}')
 
-    return render_template('class/add_class.html', form=form)
+    return render_template('class/add_class.html', form=form, header='Добавление класса')
 
 
+# Главная страница класса
 @class_views.route('/class/<int:class_id>')
 @login_required
 @correct_class_id
@@ -234,6 +247,7 @@ def view_class(class_id):
                            diary_url=diary_url)
 
 
+# Ввод количества уроков в расписании
 @class_views.route('/class/<int:class_id>/add_schedule/days', methods=["GET", "POST"])
 @login_required
 @correct_class_id
@@ -254,6 +268,7 @@ def add_schedule_days(class_id):
     return render_template('class/add_schedule_days.html', form=form)
 
 
+# Ввод предметов в расписание
 @class_views.route('/class/<int:class_id>/add_schedule/subjects/<int:mon>'
                    '/<int:tue>/<int:wed>/<int:thu>/<int:fri>/<int:sat>',
                    methods=['GET', 'POST'])
@@ -309,6 +324,7 @@ def subjects(class_id, mon, tue, wed, thu, fri, sat):
                            num_subjects=num_subjects, class_id=class_id)
 
 
+# Ссылка-приглашение в класс
 @class_views.route('/class/<int:class_id>/join', methods=["GET", "POST"])
 @login_required
 @correct_class_id
@@ -336,6 +352,7 @@ def join_class(class_id):
         return render_template('class/join_class.html', form=form)
 
 
+# Ввод количества предметов класса
 @class_views.route('/class/<int:class_id>/add_subjects/amount', methods=['GET', 'POST'])
 @login_required
 @correct_class_id
@@ -348,6 +365,7 @@ def add_subject_amount(class_id):
     return render_template('class/add_subjects_amount.html', form=form)
 
 
+# Ввод предметов класса
 @class_views.route('/class/<int:class_id>/add_subjects/<int:amount>', methods=['GET', 'POST'])
 @login_required
 @correct_class_id
@@ -370,6 +388,7 @@ def add_subjects(class_id, amount):
     return render_template('class/add_subjects.html', form=form)
 
 
+# Просмотр дневника
 @class_views.route('/class/<int:class_id>/diary/<int:year>/<int:week>')
 @login_required
 @correct_class_id
@@ -398,6 +417,7 @@ def view_diary(class_id, year, week):
                            formatted_date=formatted_date, weekdays=weekdays, back_url=back_url)
 
 
+# Редактирование дневника
 @class_views.route('/class/<int:class_id>/diary/<int:year>/<int:week>/edit')
 @login_required
 @correct_class_id
@@ -424,6 +444,7 @@ def edit_diary(class_id, year, week):
                            delete_schedule_url=delete_schedule_url)
 
 
+# Добавление урока в дневник
 @class_views.route('/class/<int:class_id>/diary/add_lesson/<int:year>/<int:week>/<int:day>',
                    methods=['GET', 'POST'])
 @login_required
@@ -457,6 +478,7 @@ def add_lesson(class_id, year, week, day):
         return redirect(f'/class/{class_id}/diary/{year}/{week}/edit')
 
 
+# Изменение урока дневника
 @class_views.route('/class/<int:class_id>/diary/edit_lesson/<int:lesson_id>',
                    methods=['GET', 'POST'])
 @login_required
@@ -491,6 +513,7 @@ def edit_lesson(class_id, lesson_id):
     return render_template('class/add_lesson.html', form=form, title='Изменение поля')
 
 
+# Удаление урока
 @class_views.route('/class/<int:class_id>/diary/delete_lesson/<int:lesson_id>', methods=['GET'])
 @login_required
 @correct_class_id
@@ -508,6 +531,7 @@ def delete_lesson(class_id, lesson_id):
     return redirect(f'/class/{class_id}/diary/{year}/{week}/edit')
 
 
+# Заполнение недели расписанием
 @class_views.route('/class/<int:class_id>/diary/fill_schedule/<int:year>/<int:week>/')
 @login_required
 @correct_class_id
@@ -515,6 +539,9 @@ def delete_lesson(class_id, lesson_id):
 def fill_in_schedule(class_id, year, week):
     db_sess = db_session.create_session()
     schedule = db_sess.query(Schedule).filter(Schedule.class_id == class_id).first()
+    if not schedule:
+        db_sess.close()
+        return redirect(f'/class/{class_id}/diary/{year}/{week}/edit')
     db_sess.query(Lesson).filter(Lesson.class_id == class_id, Lesson.year == year,
                                  Lesson.week == week).delete()
     db_sess.commit()
@@ -533,15 +560,56 @@ def fill_in_schedule(class_id, year, week):
     return redirect(f'/class/{class_id}/diary/{year}/{week}/edit')
 
 
+# Удаление расписания с данной недели
 @class_views.route('/class/<int:class_id>/diary/delete_schedule/<int:year>/<int:week>/')
 @login_required
 @correct_class_id
 @admin_required
 def delete_schedule(class_id, year, week):
     db_sess = db_session.create_session()
-    schedule = db_sess.query(Schedule).filter(Schedule.class_id == class_id).first()
     db_sess.query(Lesson).filter(Lesson.class_id == class_id, Lesson.year == year,
                                  Lesson.week == week).delete()
     db_sess.commit()
     db_sess.close()
     return redirect(f'/class/{class_id}/diary/{year}/{week}/edit')
+
+
+# Изменение параметров класса
+@class_views.route('/class/<int:class_id>/settings', methods=['GET', 'POST'])
+@login_required
+@correct_class_id
+def class_settings(class_id):
+    form = ClassForm()
+    db_sess = db_session.create_session()
+    class_ = db_sess.query(Class).get(class_id)
+    if form.validate_on_submit():
+        class_.name = form.name.data
+        class_.key = form.key.data
+        db_sess.commit()
+        db_sess.close()
+        return redirect(f'/class/{class_id}')
+    form.name.data = class_.name
+    form.key.data = class_.key
+    url_delete = request.url + '/delete'
+    db_sess.close()
+    return render_template('class/add_class.html', show_delete=True, form=form,
+                           header='Изменение Класса', url_delete=url_delete)
+
+
+# Удаление класса
+@class_views.route('/class/<int:class_id>/settings/delete', methods=['GET'])
+@login_required
+@correct_class_id
+@admin_required
+def delete_class(class_id):
+    db_sess = db_session.create_session()
+    class_ = db_sess.query(Class).get(class_id)
+    if current_user.id != class_.creator_id:
+        return abort(404)
+    db_sess.delete(class_)
+    db_sess.query(Lesson).filter(Lesson.class_id == class_id).delete()
+    db_sess.query(Subject).filter(Subject.class_id == class_id).delete()
+    db_sess.query(Schedule).filter(Schedule.class_id == class_id).delete()
+    db_sess.commit()
+    db_sess.close()
+    return redirect('/profile')

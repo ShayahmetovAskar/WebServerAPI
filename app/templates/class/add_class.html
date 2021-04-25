@@ -2,29 +2,37 @@
 
 {% block form %}
 
-<h1>Добавление класса</h1>
+<h1>{{header}}</h1>
 <form action="" method="post">
     {{ form.hidden_tag() }}
     <p>
         {{ form.name.label }}<br>
         {{ form.name(class="form-control")}}<br>
         {% for error in form.name.errors %}
-        <div class="alert alert-danger" role="alert">
-            {{error}}
-        </div>
-        {% endfor %}
+    <div class="alert alert-danger" role="alert">
+        {{error}}
+    </div>
+    {% endfor %}
     </p>
     <p>
         {{ form.key.label }}<br>
         {{ form.key(class="form-control")}}<br>
         {% for error in form.key.errors %}
-        <div class="alert alert-danger" role="alert">
-            {{error}}
-        </div>
-        {% endfor %}
+    <div class="alert alert-danger" role="alert">
+        {{error}}
+    </div>
+    {% endfor %}
     </p>
     <p>{{form.submit(type="submit", class="btn btn-primary")}}</p>
     <div>{{ message }}</div>
+
+    {% if show_delete %}
+    <br>
+    <br>
+    <br>
+    <p>Ссылка для удаления класса</p>
+    <textarea class="form-control" readonly="readonly" style="resize: none">{{url_delete}}</textarea>
+    {% endif %}
 </form>
 
 {% endblock %}
