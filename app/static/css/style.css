@@ -10,4 +10,32 @@
 
 .schedule {
     padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.members {
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.subjects {
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+
+.diary-col {
+    display: flex;
+    flex-direction: column;
+}
+.diary-card {
+    flex-grow: 1;
+    margin-top: 1rem;
+    padding: 1rem;
+}
+
+.diary-header {
+    margin-top: 1rem;
+    padding: 0.5rem;
+    flex-direction: row;
 }

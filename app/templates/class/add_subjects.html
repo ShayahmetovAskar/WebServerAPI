@@ -1,0 +1,29 @@
+{% macro render_field(field) %}
+<dd class="d-flex justify-content-center">{{ field(**kwargs)|safe }}
+    {% if field.errors %}
+    <ul class=errors>
+        {% for error in field.errors %}
+        <li>{{ error }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+</dd>
+{% endmacro %}
+
+
+{% extends "card_base.html" %}
+
+{% block form %}
+
+<h3 align="center">Добавление предметов</h3>
+<p align="center">Введите предметы из расписания</p>
+<form action="" method="post">
+    {{form.hidden_tag()}}
+    {% for subject in form.subjects %}
+    {{render_field(subject)}}
+    {% endfor %}
+    <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+    {{message}}
+</form>
+
+{% endblock %}

@@ -9,4 +9,8 @@ class Lesson(SqlAlchemyBase):
     subject_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('subjects.id'),
                                    nullable=False)
     homework = sqlalchemy.Column(sqlalchemy.String)
-    date_time = sqlalchemy.Column(sqlalchemy.DateTime, nullable=False)
+    class_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('classes.id'),
+                                 nullable=False, index=True)
+    year = sqlalchemy.Column(sqlalchemy.Integer, nullable=False, index=True)
+    week = sqlalchemy.Column(sqlalchemy.Integer, nullable=False, index=True)
+    day = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)

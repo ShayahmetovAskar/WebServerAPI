@@ -1,6 +1,6 @@
 import os
 from flask import Flask, url_for
-from .data import db_session
+
 from .views.auth import auth
 from .views.class_views import class_views
 from .views.index import index
@@ -12,6 +12,7 @@ root_path = None
 
 
 def create_app(config_file='settings.py'):
+    from .data import db_session
     app = Flask(__name__, instance_relative_config=True)
 
     app.config.from_pyfile(config_file)
@@ -23,7 +24,6 @@ def create_app(config_file='settings.py'):
 
     if app.debug:
         app.wsgi_app = DebuggedApplication(app.wsgi_app, evalex=True)
-
     test.test()
 
     global root_path

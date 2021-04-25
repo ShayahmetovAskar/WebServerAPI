@@ -9,6 +9,6 @@ class ScheduleSubject(SqlAlchemyBase):
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     schedule_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('schedules.id'),
                                     index=True)
-    name = sqlalchemy.Column(sqlalchemy.String, nullable=False)
+    subject_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('subjects.id'))
     day = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)  # День недели
     schedule = orm.relation('Schedule')

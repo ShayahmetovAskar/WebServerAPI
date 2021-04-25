@@ -18,9 +18,8 @@
         {% for subject_form in form.days[ind].subjects %}
         {{render_field(subject_form)}}
         {% endfor %}
-        <button type="button submit" name="1324" class="btn btn-link"><a
-                href="/class/{{class_id}}/add_schedule/subjects/{% if ind==0 %}{{num_subjects[0] + 1}}{% else %}{{num_subjects[0]}}{% endif %}/{% if ind==1 %}{{num_subjects[1] + 1}}{% else %}{{num_subjects[1]}}{% endif %}/{% if ind==2 %}{{num_subjects[2] + 1}}{% else %}{{num_subjects[2]}}{% endif %}/{% if ind==3 %}{{num_subjects[3] + 1}}{% else %}{{num_subjects[3]}}{% endif %}/{% if ind==4 %}{{num_subjects[4] + 1}}{% else %}{{num_subjects[4]}}{% endif %}/{% if ind==5 %}{{num_subjects[5] + 1}}{% else %}{{num_subjects[5]}}{% endif %}">Добавить
-            поле</a></button>
+        <button type="button" class="btn btn-link"><a href="/class/{{class_id}}/add_schedule/subjects/{% if ind==0 %}{{num_subjects[0] + 1}}{% else %}{{num_subjects[0]}}{% endif %}/{% if ind==1 %}{{num_subjects[1] + 1}}{% else %}{{num_subjects[1]}}{% endif %}/{% if ind==2 %}{{num_subjects[2] + 1}}{% else %}{{num_subjects[2]}}{% endif %}/{% if ind==3 %}{{num_subjects[3] + 1}}{% else %}{{num_subjects[3]}}{% endif %}/{% if ind==4 %}{{num_subjects[4] + 1}}{% else %}{{num_subjects[4]}}{% endif %}/{% if ind==5 %}{{num_subjects[5] + 1}}{% else %}{{num_subjects[5]}}{% endif %}">Добавить поле</a></button>
+        <button type="button" class="btn btn-link"><a href="/class/{{class_id}}/add_schedule/subjects/{% if ind==0 and num_subjects[0] > 0 %}{{num_subjects[0] - 1}}{% else %}{{num_subjects[0]}}{% endif %}/{% if ind==1  and num_subjects[1] > 0%}{{num_subjects[1] - 1}}{% else %}{{num_subjects[1]}}{% endif %}/{% if ind==2 and num_subjects[2] > 0 %}{{num_subjects[2] - 1}}{% else %}{{num_subjects[2]}}{% endif %}/{% if ind==3 and num_subjects[3] > 0 %}{{num_subjects[3] - 1}}{% else %}{{num_subjects[3]}}{% endif %}/{% if ind==4 and num_subjects[4] > 0 %}{{num_subjects[4] - 1}}{% else %}{{num_subjects[4]}}{% endif %}/{% if ind==5 and num_subjects[5] > 0 %}{{num_subjects[5] - 1}}{% else %}{{num_subjects[5]}}{% endif %}">Удалить поле</a></button>
 
     </div>
 </div>
@@ -52,6 +51,7 @@
     </div>
     <br>
     <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+    {{message}}
 </form>
 
 

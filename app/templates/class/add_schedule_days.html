@@ -60,15 +60,6 @@
         </div>
         {% endfor %}
     </p>
-    <p>
-        {{ form.sun.label }}
-        {{ form.sun(class="form-control")}}
-        {% for error in form.sun.errors %}
-        <div class="alert alert-danger" role="alert">
-            {{error}}
-        </div>
-        {% endfor %}
-    </p>
     <p>{{form.submit(type="submit", class="btn btn-primary")}}</p>
     <div>{{ message }}</div>
 </form>

@@ -1,0 +1,29 @@
+{% extends "card_base.html" %}
+
+
+{% block form %}
+<h2>{{title}}</h2>
+<form action="" method="post">
+    {{ form.hidden_tag() }}
+    <p>
+        {{ form.lesson.label }}<br>
+        {{ form.lesson(class="form-control")}}<br>
+        {% for error in form.lesson.errors %}
+        <div class="alert alert-danger" role="alert">
+            {{error}}
+        </div>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.homework.label }}<br>
+        {{ form.homework(class="form-control")}}<br>
+        {% for error in form.homework.errors %}
+        <div class="alert alert-danger" role="alert">
+            {{error}}
+        </div>
+        {% endfor %}
+    </p>
+    <p>{{form.submit(type="submit", class="btn btn-primary")}}</p>
+    <div>{{ message }}</div>
+</form>
+{% endblock %}

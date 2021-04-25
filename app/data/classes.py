@@ -23,6 +23,7 @@ class Class(SqlAlchemyBase):
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     name = sqlalchemy.Column(sqlalchemy.String, unique=True)
     creator_id = sqlalchemy.Column(sqlalchemy.Integer)
+    subjects = orm.relationship('Subject', back_populates='class_')
     schedule = orm.relationship('Schedule', back_populates='class_')
     key = sqlalchemy.Column(sqlalchemy.String)
     members = orm.relation('User', secondary='class_to_user', backref='member_of')

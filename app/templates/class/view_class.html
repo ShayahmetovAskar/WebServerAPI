@@ -14,55 +14,146 @@
 
 {% block content %}
 
-<h3>{{class_.name}}</h3>
+<br>
+<h3 align="center">{{class_.name}}</h3>
+<br>
 
-<div class="card d-inline-flex schedule">
-    <h3 align="center">Расписание занятий</h3>
-    {% if not schedule %}
-    {% if is_admin %}
-    <button type="button" class="btn btn-link"><a href="">Добавить</a></button>
-    {% else %}
-    <span class="align-center">Нет расписания</span>
-    {% endif %}
-    {% else %}
-    <ul class="nav nav-tabs">
-        <li class="nav-item">
-            <a class="nav-link active" data-toggle="tab" href="#mon">Пн</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" data-toggle="tab" href="#tue">Вт</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" data-toggle="tab" href="#wed">Ср</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" data-toggle="tab" href="#thu">Чт</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" data-toggle="tab" href="#fri">Пт</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" data-toggle="tab" href="#sat">Сб</a>
-        </li>
-    </ul>
-    <div class="tab-content">
-        <div class="tab-pane fade show active" id="mon">{{schedule_table(schedule[1])}}</div>
-        <div class="tab-pane fade" id="tue">{{schedule_table(schedule[2])}}</div>
-        <div class="tab-pane fade" id="wed">{{schedule_table(schedule[3])}}</div>
-        <div class="tab-pane fade" id="thu">{{schedule_table(schedule[4])}}</div>
-        <div class="tab-pane fade" id="fri">{{schedule_table(schedule[5])}}</div>
-        <div class="tab-pane fade" id="sat">{{schedule_table(schedule[6])}}</div>
+<div class="container">
+    <div class="row">
+        <div class="col-lg-5 col-md-12 col d-flex justify-content-center">
+            <div class="card schedule w-100">
+                <h3 align="center">Расписание занятий</h3>
+                {% if not schedule %}
+                {% if is_admin %}
+                <button type="button" class="btn btn-link"><a
+                        href="/class/{{class_.id}}/add_schedule/days">Добавить</a></button>
+                {% else %}
+                <span class="align-center">Нет расписания</span>
+                {% endif %}
+                {% else %}
+                <ul class="nav nav-tabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-toggle="tab" href="#mon">Пн</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#tue">Вт</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#wed">Ср</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#thu">Чт</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#fri">Пт</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#sat">Сб</a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="mon">{{schedule_table(schedule[1])}}
+                    </div>
+                    <div class="tab-pane fade" id="tue">{{schedule_table(schedule[2])}}</div>
+                    <div class="tab-pane fade" id="wed">{{schedule_table(schedule[3])}}</div>
+                    <div class="tab-pane fade" id="thu">{{schedule_table(schedule[4])}}</div>
+                    <div class="tab-pane fade" id="fri">{{schedule_table(schedule[5])}}</div>
+                    <div class="tab-pane fade" id="sat">{{schedule_table(schedule[6])}}</div>
+                </div>
+                {% if is_admin %}
+                <button type="button" class="btn btn-link"><a
+                        href="/class/{{class_.id}}/add_schedule/days">Изменить</a></button>
+                {% endif %}
+                {% endif %}
+                <a href="{{diary_url}}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Перейти в дневник</a>
+            </div>
+        </div>
+        <div class="col d-flex justify-content-center">
+            <div class="card members w-100 d-flex justify-content-between">
+                <div>
+                    <h3 align="center">Участники</h3>
+                    <table class="table table-light table-hover">
+                        <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Пользователь</th>
+                            <th scope="col">Статус</th>
+                            {% if is_creator %}
+                            <th scope="col"></th>
+                            {% endif %}
+
+                        </tr>
+                        </thead>
+                        {% for member in members %}
+                        <tr>
+                            <td>{{loop.index}}</td>
+                            <td>{{member[0]}}</td>
+                            <td>{{member[1]}}</td>
+                            {% if is_creator and member[2] != current_user.id %}
+                            <td>
+                                <div class="btn-group dropright">
+                                    <button type="button"
+                                            class="btn btn-sm btn-light dropdown-toggle"
+                                            data-toggle="dropdown" aria-haspopup="true"
+                                            aria-expanded="false">
+                                    </button>
+                                    <div class="dropdown-menu">
+                                        {% if member[1] == 'Администратор' and is_creator %}
+                                        <a class="dropdown-item" href="/class/{{class_.id}}/unset_admin/{{member[2]}}">Разжаловать администратора</a>
+                                        {% elif member[1] != 'Администратор' and is_creator %}
+                                        <a class="dropdown-item" href="/class/{{class_.id}}/set_admin/{{member[2]}}">Назначить администратором</a>
+                                        {% endif %}
+                                        {% if is_creator %}
+                                        <a class="dropdown-item" href="/class/{{class_.id}}/kick/{{member[2]}}">Исключить</a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </td>
+                            {% endif %}
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+                <div class="input-group input-group-sm mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="inputGroup-sizing-sm"></span>
+                    </div>
+                    <textarea class="form-control" readonly="readonly" style="resize: none">{{url_join}}</textarea>
+
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col d-flex justify-content-center">
+
+            <div class="card subjects w-100">
+                <h3 align="center">Предметы</h3>
+                <table class="table table-light">
+                    <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Предмет</th>
+
+                    </tr>
+                    </thead>
+                    {% for item in class_subjects %}
+                    <tr>
+                        <td>{{loop.index}}</td>
+                        <td>{{item}}</td>
+                    </tr>
+                    {% endfor %}
+
+                </table>
+                {% if is_admin %}
+                <button type="button" class="btn btn-link"><a
+                        href="/class/{{class_.id}}/add_subjects/amount">Изменить</a></button>
+                {% endif %}
+
+            </div>
+
+        </div>
     </div>
-    {% if is_admin %}
-    <button type="button" class="btn btn-link"><a href="">Изменить</a></button>
-    {% endif %}
-
-    {% endif %}
-</div>
-
-<div class="card d-inline-flex schedule">
-    <h3 align="center">Участники</h3>
-
 </div>
 
 

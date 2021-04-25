@@ -17,15 +17,12 @@ def save_picture(form_picture):
     random_hex = secrets.token_hex(8)
     _, f_ext = os.path.splitext(form_picture.filename)
     picture_fn = random_hex + f_ext
-    print(1, picture_fn)
     picture_path = os.path.join(root_path, 'static/img/profile_pictures', picture_fn)
 
     output_size = (125, 125)
     i = Image.open(form_picture)
     i.thumbnail(output_size)
-    print(123)
     i.save(picture_path)
-    print(123)
     return picture_fn
 
 
@@ -55,6 +52,7 @@ def update_user_data():
         current_user.surname = form.surname.data
         db_sess.merge(current_user)
         db_sess.commit()
+        db_sess.close()
         return redirect('/profile')
     elif request.method == 'GET':
         form.username.data = current_user.username
