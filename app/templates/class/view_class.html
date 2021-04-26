@@ -72,68 +72,11 @@
                         href="/class/{{class_.id}}/add_schedule/days">Изменить</a></button>
                 {% endif %}
                 {% endif %}
-                <a href="{{diary_url}}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Перейти в дневник</a>
+                <a href="{{diary_url}}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">Перейти
+                    в дневник</a>
             </div>
         </div>
         <div class="col d-flex justify-content-center">
-            <div class="card members w-100 d-flex justify-content-between">
-                <div>
-                    <h3 align="center">Участники</h3>
-                    <table class="table table-light table-hover">
-                        <thead class="thead-dark">
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Пользователь</th>
-                            <th scope="col">Статус</th>
-                            {% if is_creator %}
-                            <th scope="col"></th>
-                            {% endif %}
-
-                        </tr>
-                        </thead>
-                        {% for member in members %}
-                        <tr>
-                            <td>{{loop.index}}</td>
-                            <td>{{member[0]}}</td>
-                            <td>{{member[1]}}</td>
-                            {% if is_creator and member[2] != current_user.id %}
-                            <td>
-                                <div class="btn-group dropright">
-                                    <button type="button"
-                                            class="btn btn-sm btn-light dropdown-toggle"
-                                            data-toggle="dropdown" aria-haspopup="true"
-                                            aria-expanded="false">
-                                    </button>
-                                    <div class="dropdown-menu">
-                                        {% if member[1] == 'Администратор' and is_creator %}
-                                        <a class="dropdown-item" href="/class/{{class_.id}}/unset_admin/{{member[2]}}">Разжаловать администратора</a>
-                                        {% elif member[1] != 'Администратор' and is_creator %}
-                                        <a class="dropdown-item" href="/class/{{class_.id}}/set_admin/{{member[2]}}">Назначить администратором</a>
-                                        {% endif %}
-                                        {% if is_creator %}
-                                        <a class="dropdown-item" href="/class/{{class_.id}}/kick/{{member[2]}}">Исключить</a>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            </td>
-                            {% endif %}
-                        </tr>
-                        {% endfor %}
-                    </table>
-                </div>
-                <div class="input-group input-group-sm mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text" id="inputGroup-sizing-sm"></span>
-                    </div>
-                    <textarea class="form-control" readonly="readonly" style="resize: none">{{url_join}}</textarea>
-
-                </div>
-            </div>
-
-        </div>
-
-        <div class="col d-flex justify-content-center">
-
             <div class="card subjects w-100">
                 <h3 align="center">Предметы</h3>
                 <table class="table table-light">
@@ -160,6 +103,69 @@
             </div>
 
         </div>
+    </div>
+
+    <div class="col d-flex justify-content-center">
+
+
+        <div class="card members w-100 d-flex justify-content-between">
+            <div>
+                <h3 align="center">Участники</h3>
+                <table class="table table-light table-hover">
+                    <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Пользователь</th>
+                        <th scope="col">Статус</th>
+                        {% if is_creator %}
+                        <th scope="col"></th>
+                        {% endif %}
+
+                    </tr>
+                    </thead>
+                    {% for member in members %}
+                    <tr>
+                        <td>{{loop.index}}</td>
+                        <td>{{member[0]}}</td>
+                        <td>{{member[1]}}</td>
+                        {% if is_creator and member[2] != current_user.id %}
+                        <td>
+                            <div class="btn-group dropright">
+                                <button type="button"
+                                        class="btn btn-sm btn-light dropdown-toggle"
+                                        data-toggle="dropdown" aria-haspopup="true"
+                                        aria-expanded="false">
+                                </button>
+                                <div class="dropdown-menu">
+                                    {% if member[1] == 'Администратор' and is_creator %}
+                                    <a class="dropdown-item" href="/class/{{class_.id}}/unset_admin/{{member[2]}}">Разжаловать
+                                        администратора</a>
+                                    {% elif member[1] != 'Администратор' and is_creator %}
+                                    <a class="dropdown-item" href="/class/{{class_.id}}/set_admin/{{member[2]}}">Назначить
+                                        администратором</a>
+                                    {% endif %}
+                                    {% if is_creator %}
+                                    <a class="dropdown-item"
+                                       href="/class/{{class_.id}}/kick/{{member[2]}}">Исключить</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            <div class="input-group input-group-sm mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="inputGroup-sizing-sm"></span>
+                </div>
+                <textarea class="form-control" readonly="readonly" style="resize: none">{{url_join}}</textarea>
+
+            </div>
+        </div>
+
+
     </div>
 </div>
 
