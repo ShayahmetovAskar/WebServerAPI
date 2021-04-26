@@ -36,8 +36,10 @@
     <div class="row">
         <div class="col diary-col">
             <div class="diary-header card d-flex justify-content-between">
-                <a href="{{prev_url}}" class="btn btn-outline-secondary active" role="button" aria-pressed="true">Предыдущая неделя</a>
-                <a href="{{next_url}}" class="btn btn-outline-secondary active" role="button" aria-pressed="true">Следующая неделя</a>
+                <a href="{{prev_url}}" class="btn btn-outline-secondary active" role="button" aria-pressed="true">Предыдущая
+                    неделя</a>
+                <a href="{{next_url}}" class="btn btn-outline-secondary active" role="button" aria-pressed="true">Следующая
+                    неделя</a>
             </div>
         </div>
 
@@ -56,11 +58,14 @@
     </div>
 </div>
 
-{% if is_admin %}
+
 <div style="margin: 1rem">
-    <a href="{{edit_url}}" class="float-right btn btn-primary active" role="button" aria-pressed="true">Редактировать</a>
+    {% if is_admin %}
+    <a href="{{edit_url}}" class="float-right btn btn-primary active" role="button"
+       aria-pressed="true">Редактировать</a>
+    {% endif %}
     <a href="{{back_url}}" class="btn btn-primary active" role="button" aria-pressed="true">Назад</a>
 </div>
-{% endif %}
+
 
 {% endblock %}
