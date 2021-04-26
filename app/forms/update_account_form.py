@@ -4,6 +4,7 @@ from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
 
 
+# Форма для обновления полей аккаунта
 class UpdateAccountData(FlaskForm):
     username = StringField('Имя пользователя', validators=[DataRequired()])
     name = StringField('Имя (Необязательно)')

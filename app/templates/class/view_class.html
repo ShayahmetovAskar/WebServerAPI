@@ -20,7 +20,6 @@
     {% if is_creator %}
     <a href="/class/{{class_.id}}/settings" type="button" class="btn btn-outline-light" style="margin-left: 1rem">Настройки</a>
     {% endif %}
-
 </div>
 
 <br>
@@ -126,9 +125,9 @@
                     {% for member in members %}
                     <tr>
                         <td>{{loop.index}}</td>
-                        <td>{{member[0]}}</td>
-                        <td>{{member[1]}}</td>
-                        {% if is_creator and member[2] != current_user.id %}
+                        <td>{{member['username']}}</td>
+                        <td>{{member['status']}}</td>
+                        {% if is_creator and member['id'] != current_user.id %}
                         <td>
                             <div class="btn-group dropright">
                                 <button type="button"
@@ -137,16 +136,16 @@
                                         aria-expanded="false">
                                 </button>
                                 <div class="dropdown-menu">
-                                    {% if member[1] == 'Администратор' and is_creator %}
-                                    <a class="dropdown-item" href="/class/{{class_.id}}/unset_admin/{{member[2]}}">Разжаловать
+                                    {% if member['status'] == 'Администратор' and is_creator %}
+                                    <a class="dropdown-item" href="/class/{{class_.id}}/unset_admin/{{member['id']}}">Разжаловать
                                         администратора</a>
-                                    {% elif member[1] != 'Администратор' and is_creator %}
-                                    <a class="dropdown-item" href="/class/{{class_.id}}/set_admin/{{member[2]}}">Назначить
+                                    {% elif member['status'] != 'Администратор' and is_creator %}
+                                    <a class="dropdown-item" href="/class/{{class_.id}}/set_admin/{{member['id']}}">Назначить
                                         администратором</a>
                                     {% endif %}
                                     {% if is_creator %}
                                     <a class="dropdown-item"
-                                       href="/class/{{class_.id}}/kick/{{member[2]}}">Исключить</a>
+                                       href="/class/{{class_.id}}/kick/{{member['id']}}">Исключить</a>
                                     {% endif %}
                                 </div>
                             </div>

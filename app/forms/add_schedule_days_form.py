@@ -3,6 +3,7 @@ from wtforms import IntegerField, SubmitField
 from wtforms.validators import InputRequired, NumberRange, ValidationError
 
 
+# Форма для определения количества уроков для каждого дня недели
 class AddScheduleDaysForm(FlaskForm):
     mon = IntegerField('Количество уроков в понедельник',
                        validators=[InputRequired(), NumberRange(min=0, max=50)])

@@ -10,12 +10,14 @@ auth = Blueprint('auth', __name__, static_folder='static',
                  template_folder='templates')
 
 
+# Авторизация
 @auth.route('/login')
 def login():
     form = LoginForm()
     return render_template('auth/login.html', form=form)
 
 
+# Авторизация
 @auth.route('/login', methods=['POST'])
 def login_post():
     db_sess = db_session.create_session()
@@ -28,12 +30,14 @@ def login_post():
     return render_template('auth/login.html', message='Неправильный логин или пароль', form=form)
 
 
+# Вход в учетную запись
 @auth.route('/signup')
 def signup():
     form = SignUpForm()
     return render_template('auth/signup.html', form=form)
 
 
+# Вход в учетную запись
 @auth.route('/signup', methods=['POST'])
 def signup_post():
     form = SignUpForm()
@@ -59,6 +63,7 @@ def signup_post():
     return redirect('/login')
 
 
+# Выход из учетной записи
 @auth.route('/logout')
 def logout():
     logout_user()

@@ -15,8 +15,8 @@
         {% for item in lessons %}
         <tr>
             <td>{{loop.index}}</td>
-            <td>{{item[0]}}</td>
-            <td>{{item[1]}}</td>
+            <td>{{item['name']}}</td>
+            <td>{{item['homework']}}</td>
         </tr>
         {% endfor %}
     </table>

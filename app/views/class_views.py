@@ -141,6 +141,7 @@ def set_admin(class_id, user_id):
 def unset_admin(class_id, user_id):
     db_sess = db_session.create_session()
     class_ = db_sess.query(Class).get(class_id)
+    # Создатель не может быть разжалован
     if current_user.id != class_.creator_id or user_id == current_user.id:
         db_sess.close()
         return abort(404)
@@ -167,10 +168,11 @@ def kick(class_id, user_id):
     if not class_ or not user:
         db_sess.close()
         return abort(404)
-    if (
-            user in class_.admins and current_user.id != class_.creator_id) or user_id == class_.creator_id:
+    # Администратора может выгнать только создатель, создателя не может изгнать никто
+    if (user in class_.admins and current_user.id != class_.creator_id) or user_id == class_.creator_id:
         db_sess.close()
         return abort(404)
+    # Простой участник может изгнать только самого себя
     if current_user not in class_.admins and user.id != current_user.id:
         db_sess.close()
         return abort(404)
@@ -197,6 +199,7 @@ def add_class():
             creator_id=current_user.id,
         )
         current_user_ = db_sess.query(User).get(current_user.id)
+        # Создателя сразу добавляем в администраторы и в участники
         class_.admins.append(current_user_)
         class_.members.append(current_user_)
         db_sess.add(class_)
@@ -219,23 +222,27 @@ def view_class(class_id):
     class_ = db_sess.query(Class).filter(Class.id == class_id).first()
     schedule = db_sess.query(Schedule).filter(Schedule.class_id == class_id).first()
     members = []
+    # Заполняем список участников класса
     for member in class_.members:
         status = ''
         if member.id == class_.creator_id:
             status = 'Создатель'
         elif check_admin(class_id, member):
             status = 'Администратор'
-        members.append([member.username, status, member.id])
+        members.append({'username': member.username, 'status': status, 'id': member.id})
+    # Список предметов класса
     class_subjects = db_sess.query(Subject).with_entities(Subject.name).filter(
         Subject.class_id == class_id).all()
     class_subjects = [i[0] for i in class_subjects]
     day_to_subjects = None
+    # Расписаниеи класса по неделям
     if schedule:
         day_to_subjects = {1: [], 2: [], 3: [], 4: [], 5: [], 6: []}
         for subj in schedule.subjects:
             subj_name = db_sess.query(Subject).with_entities(Subject.name).filter(
                 Subject.id == subj.subject_id).first()
             day_to_subjects[subj.day].append(subj_name[0])
+    # Является ли администратором или создателем класса
     is_admin = check_admin(class_id)
     is_creator = class_.creator_id == current_user.id
     db_sess.close()
@@ -253,8 +260,6 @@ def view_class(class_id):
 @correct_class_id
 @admin_required
 def add_schedule_days(class_id):
-    if not check_admin(class_id):
-        abort(404)
     form = AddScheduleDaysForm()
     if form.validate_on_submit():
         mon = form.mon.data
@@ -276,28 +281,34 @@ def add_schedule_days(class_id):
 @correct_class_id
 @admin_required
 def subjects(class_id, mon, tue, wed, thu, fri, sat):
-    if not check_admin(class_id):
-        abort(404)
+    # Количество предметов по неделям из предыдущей формы
     num_subjects = [mon, tue, wed, thu, fri, sat]
-    d = []
+    # Поля текущей формы
+    form_days = []
     for i in num_subjects:
         a = []
         for j in range(i):
             a.append({'name': ''})
-        d.append({'subjects': a})
+        form_days.append({'subjects': a})
     weekdays = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье']
     db_sess = db_session.create_session()
+
     subjects_list = db_sess.query(Subject).with_entities(Subject.id, Subject.name).filter(
         Subject.class_id == class_id).all()
     db_sess.close()
+    # Список предметов, которыми можно заполнить расписание
     subjects_list = [(i[0], i[1]) for i in subjects_list]
+    # В начало добавляем пустой элемент
     subjects_list.insert(0, ("", "---"))
-    form = WeekScheduleForm(days=d)
+    form = WeekScheduleForm(days=form_days)
+    # Для каждого SelectField выставляем на выбор все уроки
     for i in form.days.entries:
         for j in i.subjects.entries:
             j.name_.choices = subjects_list
     if form.validate_on_submit():
         db_sess = db_session.create_session()
+
+        # Удаляем старое расписание
         schedule = db_sess.query(Schedule).filter(Schedule.class_id == class_id).first()
         if not schedule:
             schedule = Schedule(class_id=class_id)
@@ -309,6 +320,7 @@ def subjects(class_id, mon, tue, wed, thu, fri, sat):
                 ScheduleSubject.schedule == schedule).delete()
             db_sess.commit()
 
+        # Заполняем расписание новыми данными
         for i in range(len(form.days.entries)):
             for j in form.days.entries[i].subjects.entries:
                 schedule_subject = ScheduleSubject(
@@ -334,6 +346,7 @@ def join_class(class_id):
     class_ = db_sess.query(Class).get(class_id)
 
     if form.validate_on_submit():
+        # Проверка ключа
         if form.key.data == class_.key:
             current_user_ = db_sess.query(User).get(current_user.id)
             class_.members.append(current_user_)
@@ -371,10 +384,11 @@ def add_subject_amount(class_id):
 @correct_class_id
 @admin_required
 def add_subjects(class_id, amount):
-    d = []
+    # Поля для SelectField
+    form_subjects = []
     for i in range(amount):
-        d.append({'name': ''})
-    form = SubjectsForm(subjects=d)
+        form_subjects.append({'name': ''})
+    form = SubjectsForm(subjects=form_subjects)
     if form.validate_on_submit():
         db_sess = db_session.create_session()
         db_sess.query(Subject).filter(Subject.class_id == class_id).delete()
@@ -395,22 +409,29 @@ def add_subjects(class_id, amount):
 @membership_required
 def view_diary(class_id, year, week):
     db_sess = db_session.create_session()
+    # Получаем уроки для данного класса для определенной недели года
     lessons = db_sess.query(Lesson).with_entities(Lesson.day, Lesson.subject_id, Lesson.homework). \
         filter(Lesson.year == year, Lesson.week == week, Lesson.class_id == class_id).all()
+    # Список уроков по дням
     day_to_lesson = [[] for _ in range(6)]
     for item in lessons:
         subject = db_sess.query(Subject).with_entities(Subject.name). \
             filter(Subject.id == item[1]).first()
-        day_to_lesson[item[0] - 1].append([subject[0], item[2]])
+        # Словарь с названием урока и домашним заданием
+        day_to_lesson[item[0] - 1].append({'name': subject[0], 'homework': item[2]})
     db_sess.close()
     is_admin = check_admin(class_id)
+    # Определяются ссылки для предыдущей и следующей недели
     y_p, w_p = DateHelper.subtract_week(year, week)
     prev_url = f'/class/{class_id}/diary/{y_p}/{w_p}'
     y_n, w_n = DateHelper.add_week(year, week)
     next_url = f'/class/{class_id}/diary/{y_n}/{w_n}'
+    # Ссылки для режима редактирования и для возврата к главной странице класса
     edit_url = f'/class/{class_id}/diary/{year}/{week}/edit'
-    formatted_date = DateHelper.formatted_dates(year, week)
     back_url = f'/class/{class_id}'
+    # Дата в виде день.месяц.год
+    formatted_date = DateHelper.formatted_dates(year, week)
+
     weekdays = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье']
     return render_template('class/diary.html', lessons=day_to_lesson, is_admin=is_admin,
                            next_url=next_url, prev_url=prev_url, edit_url=edit_url,
@@ -424,6 +445,7 @@ def view_diary(class_id, year, week):
 @admin_required
 def edit_diary(class_id, year, week):
     db_sess = db_session.create_session()
+    # Выборка уроков для определенного класса в определенную неделю
     lessons = db_sess.query(Lesson).with_entities(
         Lesson.id, Lesson.day, Lesson.subject_id, Lesson.homework). \
         filter(Lesson.year == year, Lesson.week == week, Lesson.class_id == class_id).all()
@@ -431,11 +453,14 @@ def edit_diary(class_id, year, week):
     for item in lessons:
         subject = db_sess.query(Subject).with_entities(Subject.name). \
             filter(Subject.id == item[2]).first()
-        day_to_lesson[item[1] - 1].append([subject[0], item[3], item[0]])
+        day_to_lesson[item[1] - 1].append({'name': subject[0], 'homework': item[3], 'id': item[0]})
     db_sess.close()
     weekdays = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье']
+    # Ссылка для перехода назад
     back_url = f'/class/{class_id}/diary/{year}/{week}'
+    # Ссылка для заполнения этой недели расписанием
     fill_schedule_url = f'/class/{class_id}/diary/fill_schedule/{year}/{week}/'
+    # Ссылка для удаления расписания на эту неделю
     delete_schedule_url = f'/class/{class_id}/diary/delete_schedule/{year}/{week}'
     formatted_date = DateHelper.formatted_dates(year, week)
     return render_template('class/edit_diary.html', lessons=day_to_lesson, class_id=class_id,
@@ -542,9 +567,12 @@ def fill_in_schedule(class_id, year, week):
     if not schedule:
         db_sess.close()
         return redirect(f'/class/{class_id}/diary/{year}/{week}/edit')
+    # Удаление существующего расписания
     db_sess.query(Lesson).filter(Lesson.class_id == class_id, Lesson.year == year,
                                  Lesson.week == week).delete()
     db_sess.commit()
+
+    # Заполнение расписанием
     for item in schedule.subjects:
         lesson = Lesson(
             subject_id=item.subject_id,
@@ -590,6 +618,8 @@ def class_settings(class_id):
         return redirect(f'/class/{class_id}')
     form.name.data = class_.name
     form.key.data = class_.key
+
+    # Ссылка для удаления класса (показывается в текстовом поле)
     url_delete = request.url + '/delete'
     db_sess.close()
     return render_template('class/add_class.html', show_delete=True, form=form,
@@ -607,6 +637,7 @@ def delete_class(class_id):
     if current_user.id != class_.creator_id:
         return abort(404)
     db_sess.delete(class_)
+    # Удаление всего, что связано с классом
     db_sess.query(Lesson).filter(Lesson.class_id == class_id).delete()
     db_sess.query(Subject).filter(Subject.class_id == class_id).delete()
     db_sess.query(Schedule).filter(Schedule.class_id == class_id).delete()

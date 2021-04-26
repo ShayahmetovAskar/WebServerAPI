@@ -15,10 +15,10 @@
         {% for item in lessons %}
         <tr>
             <td>{{loop.index}}</td>
-            <td>{{item[0]}}</td>
-            <td>{{item[1]}}</td>
-            <td><a class="btn btn-warning btn-sm" href="/class/{{class_id}}/diary/edit_lesson/{{item[2]}}"><i class="fa fa-edit"></i>
-            </a><a class="btn btn-danger btn-sm" href="/class/{{class_id}}/diary/delete_lesson/{{item[2]}}"><i class="fa fa-edit"></i></a></td>
+            <td>{{item['name']}}</td>
+            <td>{{item['homework']}}</td>
+            <td><a class="btn btn-warning btn-sm" href="/class/{{class_id}}/diary/edit_lesson/{{item['id']}}"><i class="fa fa-edit"></i>
+            </a><a class="btn btn-danger btn-sm" href="/class/{{class_id}}/diary/delete_lesson/{{item['id']}}"><i class="fa fa-edit"></i></a></td>
         </tr>
         {% endfor %}
     </table>

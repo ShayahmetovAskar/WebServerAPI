@@ -14,17 +14,22 @@ index = Blueprint('index', __name__, static_folder='static',
                   template_folder='templates')
 
 
+# Сохраниение картинки пользователя
 def save_picture(form_picture):
     from app import root_path
+    # Генерация случайного префикса файла
     random_hex = secrets.token_hex(8)
     _, f_ext = os.path.splitext(form_picture.filename)
+    # Название файла
     picture_fn = random_hex + f_ext
     picture_path = os.path.join(root_path, 'static/img/profile_pictures', picture_fn)
 
+    # Сжатие картинки
     output_size = (125, 125)
     i = Image.open(form_picture)
     i.thumbnail(output_size)
     i.save(picture_path)
+
     return picture_fn
 
 
@@ -33,10 +38,12 @@ def test():
     return render_template('base.html')
 
 
+# Личный кабинет пользвателя
 @index.route('/profile/')
 @login_required
 def profile():
     db_sess = db_session.create_session()
+    # Классы, в которых состоит участник
     current_user_ = db_sess.query(User).filter(User.id == current_user.id).first()
     classes = [{'id': i.id, 'name': i.name} for i in current_user_.member_of]
     db_sess.close()
@@ -44,6 +51,7 @@ def profile():
     return render_template('profile.html', image_file=image_file, classes=classes)
 
 
+# Изменение данных пользователя
 @index.route('/update_user_data', methods=['GET', 'POST'])
 @login_required
 def update_user_data():
@@ -53,6 +61,7 @@ def update_user_data():
         if form.picture.data:
             picture_file = save_picture(form.picture.data)
             current_user.image_file = picture_file
+        # Заполнение полей данными пользователя
         current_user.username = form.username.data
         current_user.name = form.name.data
         current_user.surname = form.surname.data

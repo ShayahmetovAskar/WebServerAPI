@@ -4,6 +4,7 @@ from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired, EqualTo
 
 
+# Форма для регистрации
 class SignUpForm(FlaskForm):
     email = EmailField('Почта', validators=[DataRequired()])
     username = StringField('Имя пользователя', validators=[DataRequired()])
