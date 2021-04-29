@@ -35,6 +35,8 @@ def save_picture(form_picture):
 
 @index.route('/')
 def test():
+    if current_user.is_authenticated:
+        return redirect('/profile')
     return render_template('base.html')
 
 
